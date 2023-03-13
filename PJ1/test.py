@@ -1,3 +1,3 @@
 import numpy as np
-
-print(np.arange(-5, 5, 0.1)[:, np.newaxis])
+for i in range(10,-1,-1):
+    print(i)

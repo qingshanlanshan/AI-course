@@ -9,6 +9,7 @@ def sin_sample_gen()->Tuple[float,float]:
 
 def sin_sample_gen_array(size:int)->Tuple[np.array,np.array]:
     x = np.random.uniform(-np.pi, np.pi, size)
+    x.sort()
     y = np.sin(x)
     y += np.random.normal(-0.01, 0.01, size)
     return (x, y)
