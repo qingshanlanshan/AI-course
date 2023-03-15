@@ -2,3 +2,4 @@
 */test.py
 */sineFigure
 *.png
+__pycache__

@@ -34,19 +34,19 @@ if __name__ == "__main__":
     for i in range(len(x)):
         a = x[i]
         b = yBar[i]
-        error = net.train(np.array([a]), np.array([b]), False)
+        a=net.prepoccess(np.array([a]),reshape=True)
+        b=net.prepoccess(np.array([b]),reshape=True)
+        out=net.forwardPropagation(a)
+        net.backPropagation(b)
+        net.step+=1
+        # error = net.train(np.array([a]), np.array([b]), False)
         if net.step % 1000 == 0 or net.step == 1:
+            error=net.error(out,b)
             print("step={} error={}".format(net.step, error))
             loss.append(error)
             step.append(net.step)
-        # if error-last_error<0.0000001 and net.step>10000 and error<0.001:
-        #     break
-        # else:
-        #     last_error=error
-        # if KeyboardInterrupt:
-        #     break
     output = []
     for i in x:
-        output.append(net.predict(np.array([i]), False)[0])
+        output.append(net.forwardPropagation(net.prepoccess(np.array([i]),reshape=True))[0])
     draw_fit_curve(origin_xs=x, origin_ys=y,
                    prediction_ys=np.array(output)*2-1, step_arr=step, loss_arr=loss)

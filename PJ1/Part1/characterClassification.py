@@ -8,15 +8,16 @@ from typing import Tuple
 
 curPath=os.path.abspath(os.path.dirname(__file__))
 trainPath=curPath+"/../train"
-def getImg(character:int,number:int):
-    img=trainPath+"/"+str(character)+"/"+str(number)+".bmp"
-    return cv.imread(img,0)
+def getImg(character:int,number:int)->Tuple[np.ndarray,np.ndarray]:
+    imgPath=trainPath+"/"+str(character)+"/"+str(number)+".bmp"
+    img=cv.imread(imgPath,0)
+    return imgPrepocess(img,character)
 
-def prepocessing(img,i):
+def imgPrepocess(img:cv.Mat,character:int)->Tuple[np.ndarray,np.ndarray]:
     ret=np.array(img).flatten()
     out=np.zeros(12)
-    out[i-1]=1
-    return ret&1,out
+    out[character-1]=1
+    return (ret&1,out)
 
 def showFig(stepArray,lossArray):
     fig = plt.figure()
@@ -28,7 +29,7 @@ def showFig(stepArray,lossArray):
     plt.show()
 
 if __name__=="__main__":
-    net=network.network(3,(28**2,50,12),0.1,0.05)
+    net=network.network((28**2,100,20,12),0.05,0,True)
     dataSet=[]
     for i in range(1,13):
         for j in range(1,621):
@@ -38,23 +39,35 @@ if __name__=="__main__":
     lossArray=[]
     stepArray=[]
     lastLoss=0
-    for i in range(trainSize):
-        img=getImg(dataSet[i][0],dataSet[i][1])
-        input,output=prepocessing(img,dataSet[i][0])
-        loss=net.train(input,output,True)
+
+    while True:
+        b=1
+        j=random.randint(1,620)
+        input,target=getImg(b,j)
+        # j=random.randint(1,trainSize)
+        # input,target=getImg(dataSet[j][0],dataSet[j][1])
+        input,target=net.prepoccess(input,reshape=True),net.prepoccess(target,reshape=True)
+        # output=net.forwardPropagation(input)
+        output=net.forwardPropagation(input)
+        
+        net.backPropagation(target)
+        net.step+=1
+        
+        
         if net.step%1000==0:
+            loss=net.crossEntropy(output,target)
             lossArray.append(loss)
             stepArray.append(net.step)
-            print("i={} step={} loss={}".format(i, net.step,loss))
-        if abs(lastLoss-loss)<0.000001 and loss < 0.00001:
-            break
-        else:
-            lastLoss=loss
+            print("pic={} step={} loss={}".format(j, net.step,loss))
+            if abs(lastLoss-loss)<0.000001 and loss < 0.0001 and net.step>10000:
+                break
+            else:
+                lastLoss=loss
 
     count=0
     for i in range(trainSize+1,12*620):
-        img=getImg(dataSet[i][0],dataSet[i][1])
-        input,output=prepocessing(img,dataSet[i][0])
+        input,target=getImg(dataSet[i][0],dataSet[i][1])
+        input=net.prepoccess(input,reshape=True)
         output=net.forwardPropagation(input)
         if output.argmax()==dataSet[i][0]-1:
             count+=1
