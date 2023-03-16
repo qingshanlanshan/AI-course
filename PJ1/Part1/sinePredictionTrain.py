@@ -61,6 +61,6 @@ if __name__ == "__main__":
         output.append(net.forwardPropagation(net.prepoccess(np.array([i]),reshape=True))[0])
     
     curPath=os.path.abspath(os.path.dirname(__file__))
-    net.dump(curPath+"/sine")
+    # net.dump(curPath+"/sine")
     draw_fit_curve(origin_xs=x, origin_ys=y,
                    prediction_ys=np.array(output)*2-1, step_arr=step, loss_arr=loss)

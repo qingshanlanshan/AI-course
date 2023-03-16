@@ -78,7 +78,7 @@ if __name__=="__main__":
                 lastLoss=loss
         except KeyboardInterrupt:
             break
-    net.dump(curPath+"/characterClassifier.npz")
+    # net.dump(curPath+"/characterClassifier.npz")
                 
 
     
