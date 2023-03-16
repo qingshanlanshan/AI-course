@@ -72,7 +72,7 @@ if __name__=="__main__":
             stepArray.append(net.step)
             accuracy=test(net,trainSet)
             print("step={} loss={} accuracy={}".format(net.step,loss,accuracy))
-            if abs(lastLoss-loss)<0.000001 and loss < 0.0001 and accuracy>0.95:
+            if abs(lastLoss-loss)<0.000001 and loss < 0.00001 and accuracy>0.9999:
                 break
             else:
                 lastLoss=loss
