@@ -2,10 +2,9 @@ from typing import Tuple
 import numpy as np
 
 class network:
-    def __init__(self, nodeNumber:tuple, learningRate:float, decay:float,softmax=False):
+    def __init__(self, nodeNumber:tuple, learningRate:float,softmax=False):
         self.learningRate = learningRate
         self.step=0
-        self.decay=decay
         # self.target:np.array = np.zeros(outputNodeNumber)
         self.enableSoftmax=softmax
 
@@ -91,22 +90,11 @@ class network:
             input=input.reshape((len(input),1))
         return input
     
-    # def predict(self,input:np.ndarray,Normalize:bool=True)->np.ndarray:
-    #     if Normalize:
-    #         input=self.normalize(input)
-    #     input=input.reshape((len(input),1))
-    #     output=self.forwardPropagation(input)
-    #     output=output.reshape(len(output))
-    #     if Normalize:
-    #         output=self.denormalize(output,-1,1)
-    #     return output
-    
     def dump(self,filename:str):
-        outfile=open(filename,"w")
-        np.savez(outfile, x=self.weight,y=self.const)
+        np.savez(filename, x=np.array(self.weight, dtype=object),y=np.array(self.const, dtype=object), allow_pickle=True)
         
     def load(self,filename:str):
-        file=np.load(filename)
+        file=np.load(filename, allow_pickle=True)
         self.weight=file["x"]
         self.const=file["y"]
         
