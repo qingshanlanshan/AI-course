@@ -3,6 +3,7 @@ import sampleGeneration as sp
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import random
 
 
 def draw_fit_curve(origin_xs, origin_ys, prediction_ys, step_arr, loss_arr):
@@ -24,29 +25,37 @@ def draw_fit_curve(origin_xs, origin_ys, prediction_ys, step_arr, loss_arr):
     plt.legend()
     plt.show()
 
+def unison_shuffled_copies(a, b):
+    assert len(a) == len(b)
+    p = np.random.permutation(len(a))
+    return a[p], b[p]
 
 if __name__ == "__main__":
     net = network.network(nodeNumber=(1, 10, 1), learningRate=0.05)
-    x, y = sp.sin_sample_gen_array(1000000,sort=False)
+    x, y = sp.sin_sample_gen_array(10000,sort=False)
+    xBar=x
     yBar=(y+1)/2
+    
     last_error = 0
     loss = []
     step = []
-    for i in range(len(x)):
-        a = x[i]
-        b = yBar[i]
-        a=net.prepoccess(np.array([a]),reshape=True)
-        b=net.prepoccess(np.array([b]),reshape=True)
-        out=net.forwardPropagation(a)
-        net.backPropagation(b)
-        net.step+=1
-        # error = net.train(np.array([a]), np.array([b]), False)
-        if net.step % 10000 == 0 or net.step == 1:
-            error=net.error(out,b)
-            print("step={} error={}".format(net.step, error))
-            loss.append(error)
-            step.append(net.step)
-            net.learningRate/=(1+0.001)
+    for loop in range(1000):
+        xBar,yBar=unison_shuffled_copies(xBar,yBar)
+        for i in range(len(x)):
+            a = xBar[i]
+            b = yBar[i]
+            a=net.prepoccess(np.array([a]),reshape=True)
+            b=net.prepoccess(np.array([b]),reshape=True)
+            out=net.forwardPropagation(a)
+            net.backPropagation(b)
+            net.step+=1
+            # error = net.train(np.array([a]), np.array([b]), False)
+            if net.step % 10000 == 0 or net.step == 1:
+                error=net.error(out,b)
+                print("step={} error={}".format(net.step, error))
+                loss.append(error)
+                step.append(net.step)
+                net.learningRate/=(1+0.001)
     output = []
     for i in x:
         output.append(net.forwardPropagation(net.prepoccess(np.array([i]),reshape=True))[0])
