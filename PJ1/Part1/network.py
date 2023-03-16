@@ -36,10 +36,10 @@ class network:
         maxData = np.max(data)
         return data / (maxData - minData) * (max - min) + min
     
-    def sigmod(self,x:float)->float:
+    def sigmod(self,x:np.ndarray)->np.ndarray:
         return 1/(1+np.exp(-x))
     
-    def sigmodDerivative(self,f:float)->float:
+    def sigmodDerivative(self,f:np.ndarray)->np.ndarray:
         return f*(1-f)
     
     def forwardPropagation(self,input:np.ndarray)->np.ndarray:
@@ -57,7 +57,7 @@ class network:
     def backPropagation(self,target:np.ndarray):
         delta=[None]*(self.layerNumber)
         if self.enableSoftmax:
-            delta[self.layerNumber-1]=self.layer[-1]-target
+            delta[self.layerNumber-1]=(self.layer[-1]-target)/len(target)
         else:
             delta[self.layerNumber-1]=(self.layer[self.layerNumber-1]-target)*self.sigmodDerivative(self.layer[self.layerNumber-1])
         for i in range(self.layerNumber-2,0,-1):
@@ -71,7 +71,7 @@ class network:
         return np.sum(np.square(target-output))/2
     
     def crossEntropy(self,output:np.ndarray,target:np.ndarray)->float:
-        return -np.sum(target*np.log(output))
+        return -np.average(target*np.log(output))
     
     def learningRateDecline(self):
         self.learningRate /= (1+self.decay)

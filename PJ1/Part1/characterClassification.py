@@ -27,9 +27,19 @@ def showFig(stepArray,lossArray):
     plt.title('BP Loss')
     plt.legend()
     plt.show()
+    
+def test(testSet:list):
+    count=0
+    for i in testSet:
+        input,target=getImg(i[0],i[1])
+        input=net.prepoccess(input,reshape=True)
+        output=net.forwardPropagation(input)
+        if output.argmax()==i[0]-1:
+            count+=1
+    return count/len(testSet)
 
 if __name__=="__main__":
-    net=network.network((28**2,100,20,12),0.05,0,True)
+    net=network.network((28**2,100,20,12),0.1,0,softmax=True)
     dataSet=[]
     for i in range(1,13):
         for j in range(1,621):
@@ -39,39 +49,34 @@ if __name__=="__main__":
     lossArray=[]
     stepArray=[]
     lastLoss=0
-
+    trainSet=dataSet[0:trainSize]
     while True:
-        b=1
-        j=random.randint(1,620)
-        input,target=getImg(b,j)
-        # j=random.randint(1,trainSize)
-        # input,target=getImg(dataSet[j][0],dataSet[j][1])
-        input,target=net.prepoccess(input,reshape=True),net.prepoccess(target,reshape=True)
-        # output=net.forwardPropagation(input)
-        output=net.forwardPropagation(input)
+        for item in trainSet:
+            input,target=getImg(item[0],item[1])
+            # j=random.randint(1,trainSize)
+            # input,target=getImg(dataSet[j][0],dataSet[j][1])
+            input,target=net.prepoccess(input,reshape=True),net.prepoccess(target,reshape=True)
+            # output=net.forwardPropagation(input)
+            output=net.forwardPropagation(input)
+            
+            net.backPropagation(target)
+            net.step+=1
+            
+            
         
-        net.backPropagation(target)
-        net.step+=1
+        loss=net.crossEntropy(output,target)
+        lossArray.append(loss)
+        stepArray.append(net.step)
+        accuracy=test(dataSet[trainSize+1:-1])
+        print("step={} loss={} accuracy={}".format(net.step,loss,accuracy))
+        if abs(lastLoss-loss)<0.000001 and loss < 0.0001 and accuracy>0.95:
+            break
+        else:
+            lastLoss=loss
         
-        
-        if net.step%1000==0:
-            loss=net.crossEntropy(output,target)
-            lossArray.append(loss)
-            stepArray.append(net.step)
-            print("pic={} step={} loss={}".format(j, net.step,loss))
-            if abs(lastLoss-loss)<0.000001 and loss < 0.0001 and net.step>10000:
-                break
-            else:
-                lastLoss=loss
+                
 
-    count=0
-    for i in range(trainSize+1,12*620):
-        input,target=getImg(dataSet[i][0],dataSet[i][1])
-        input=net.prepoccess(input,reshape=True)
-        output=net.forwardPropagation(input)
-        if output.argmax()==dataSet[i][0]-1:
-            count+=1
-    print("Accuracy:{}".format(count/(12*620-trainSize)))
+    
         
     
     showFig(stepArray,lossArray)
