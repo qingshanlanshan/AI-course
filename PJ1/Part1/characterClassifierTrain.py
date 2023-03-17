@@ -19,12 +19,17 @@ def imgPrepocess(img:cv.Mat,character:int)->Tuple[np.ndarray,np.ndarray]:
     out[character-1]=1
     return (ret&1,out)
 
-def showFig(stepArray,lossArray):
+def showFig(stepArray,lossArray,accuracyArray):
     fig = plt.figure()
-    plt.plot(stepArray,lossArray)
-    ax1 = fig.add_subplot(111)
+    # plt.plot(stepArray,lossArray)
+    ax1 = fig.add_subplot(121)
     l1=ax1.plot(stepArray, lossArray, color='red', label='Loss')
     plt.title('BP Loss')
+    plt.legend()
+    
+    ax2=fig.add_subplot(122)
+    l2=ax2.plot(stepArray,accuracyArray,color='blue',label='Accuracy')
+    plt.title('BP Accuracy')
     plt.legend()
     plt.show()
     
@@ -51,6 +56,7 @@ if __name__=="__main__":
     trainSize=int(620*12*0.9)
     lossArray=[]
     stepArray=[]
+    accuracyArray=[]
     lastLoss=0
     while True:
         try:
@@ -68,9 +74,10 @@ if __name__=="__main__":
                 
             
             loss=net.crossEntropy(output,target)
+            accuracy=test(net,trainSet)
             lossArray.append(loss)
             stepArray.append(net.step)
-            accuracy=test(net,trainSet)
+            accuracyArray.append(accuracy)
             print("step={} loss={} accuracy={}".format(net.step,loss,accuracy))
             if abs(lastLoss-loss)<0.000001 and loss < 0.00001 and accuracy>0.9999:
                 break
@@ -79,6 +86,7 @@ if __name__=="__main__":
         except KeyboardInterrupt:
             break
     # net.dump(curPath+"/characterClassifier.npz")
+    showFig(stepArray,lossArray,accuracyArray)
                 
 
     

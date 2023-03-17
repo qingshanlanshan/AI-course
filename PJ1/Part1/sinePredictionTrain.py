@@ -33,13 +33,13 @@ def unison_shuffled_copies(a, b):
 if __name__ == "__main__":
     net = network.network(nodeNumber=(1, 10, 1), learningRate=0.05)
     x, y = sp.sin_sample_gen_array(10000,sort=False)
-    xBar=x
+    xBar=x/np.pi
     yBar=(y+1)/2
     
     last_error = 0
     loss = []
     step = []
-    for loop in range(1000):
+    for loop in range(100):
         xBar,yBar=unison_shuffled_copies(xBar,yBar)
         for i in range(len(x)):
             a = xBar[i]
@@ -57,7 +57,7 @@ if __name__ == "__main__":
                 step.append(net.step)
                 net.learningRate/=(1+0.001)
     output = []
-    for i in x:
+    for i in x/np.pi:
         output.append(net.forwardPropagation(net.prepoccess(np.array([i]),reshape=True))[0])
     
     curPath=os.path.abspath(os.path.dirname(__file__))

@@ -17,7 +17,7 @@ if __name__ == "__main__":
             print("input:")
             x:float=float(input())
             inputArray.append(x)
-            y=net.forwardPropagation(net.prepoccess(np.array([x]),reshape=True))
+            y=net.forwardPropagation(net.prepoccess(np.array([x/np.pi]),reshape=True))
             y=y.flatten()*2-1
             print(y)
             outputArray.append(y)
