@@ -12,7 +12,7 @@ if __name__=="__main__":
             DataSet.append((i,j))
     net.load(curPath+"/characterClassifier.npz")
     accuracy=cc.test(net,DataSet)
-    print("Accuracy={}".format(accuracy))
+    print("Accuracy={}%".format(100.*accuracy))
         
         
 

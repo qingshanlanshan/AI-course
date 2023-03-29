@@ -58,6 +58,7 @@ if __name__=="__main__":
     stepArray=[]
     accuracyArray=[]
     lastLoss=0
+    epoch=0
     while True:
         try:
             random.shuffle(trainSet)
@@ -69,16 +70,19 @@ if __name__=="__main__":
                 # output=net.forwardPropagation(input)
                 output=net.forwardPropagation(input)
                 net.backPropagation(target)
-                net.step+=1
+                # net.step+=1
                 
                 
-            
+            epoch+=1
+            # net.learningRate/=(1+0.001)
             loss=net.crossEntropy(output,target)
             accuracy=test(net,trainSet)
             lossArray.append(loss)
-            stepArray.append(net.step)
+            # stepArray.append(net.step)
+            stepArray.append(epoch)
             accuracyArray.append(accuracy)
-            print("step={} loss={} accuracy={}".format(net.step,loss,accuracy))
+            # print("step={} loss={} accuracy={}".format(net.step,loss,accuracy))
+            print("epoch={} loss={} accuracy={}".format(epoch,loss,accuracy))
             if abs(lastLoss-loss)<0.000001 and loss < 0.00001 and accuracy>0.9999:
                 break
             else:
