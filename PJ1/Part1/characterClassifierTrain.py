@@ -52,7 +52,7 @@ if __name__=="__main__":
     testSet=[]
     for i in range(1,13):
         for j in range(int(620*0.9+1),621):
-            trainSet.append((i,j))
+            testSet.append((i,j))
     trainSize=int(620*12*0.9)
     lossArray=[]
     stepArray=[]
@@ -81,8 +81,9 @@ if __name__=="__main__":
             # stepArray.append(net.step)
             stepArray.append(epoch)
             accuracyArray.append(accuracy)
+            test_accuracy=test(net,testSet)
             # print("step={} loss={} accuracy={}".format(net.step,loss,accuracy))
-            print("epoch={} loss={} accuracy={}".format(epoch,loss,accuracy))
+            print("epoch={} loss={} accuracy={} test accuracy={}".format(epoch,loss,accuracy,test_accuracy))
             if abs(lastLoss-loss)<0.000001 and loss < 0.00001 and accuracy>0.9999:
                 break
             else:

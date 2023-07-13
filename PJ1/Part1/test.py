@@ -1,2 +1,9 @@
-for i in range(1,2):
-    print(i)
+d={}
+d[1]=0
+try:
+    d[0]
+    print(True)
+except KeyError:
+    print(False)
+    
+print(d[1])

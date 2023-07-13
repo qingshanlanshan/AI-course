@@ -6,3 +6,9 @@ __pycache__
 PDF
 test*
 data
+*my_result*
+*.pt
+*.npz
+Untitled*
+Papers
+!PJ2/NER/example_data/example_my_result.txt

@@ -2,13 +2,15 @@ from typing import Tuple
 import numpy as np
 
 class network:
-    def __init__(self, nodeNumber:tuple, learningRate:float,softmax=False):
+    def __init__(self, nodeNumber:tuple, learningRate:float,softmax=False,dropout=[]):
         self.learningRate = learningRate
         self.step=0
         # self.target:np.array = np.zeros(outputNodeNumber)
         self.enableSoftmax=softmax
-
-            # self.forwardPropagation=self.forwardPropagationRegression
+        self.dropout={}
+        for i in dropout:
+            self.dropout[i[0]]=i[1]
+        self.mask={}
         self.nodeNumber=nodeNumber
         self.layerNumber=len(nodeNumber)
         self.layer=[]
@@ -42,17 +44,22 @@ class network:
         return f*(1-f)
     
     def forwardPropagation(self,input:np.ndarray)->np.ndarray:
+        self.mask={}
         self.layer[0]=input
         for layerNumber in range(self.layerNumber-2):
             self.layer[layerNumber+1]=self.weight[layerNumber].dot(self.layer[layerNumber])+self.const[layerNumber]
             self.layer[layerNumber+1]=self.sigmod(self.layer[layerNumber+1])
+            if layerNumber+1 in self.dropout:
+                mask=np.random.binomial(1/(1-self.dropout[layerNumber+1]),1-self.dropout[layerNumber+1],size=self.layer[layerNumber+1].shape)
+                self.mask[layerNumber+1]=mask
+                self.layer[layerNumber+1]*=mask
         self.layer[-1]=self.weight[-1].dot(self.layer[-2])+self.const[-1]
         if self.enableSoftmax:
             self.layer[-1]=self.softmax(self.layer[-1])
         else:
             self.layer[-1]=self.sigmod(self.layer[-1])
         return self.layer[-1]
-    
+
     def backPropagation(self,target:np.ndarray):
         delta=[None]*(self.layerNumber)
         if self.enableSoftmax:
@@ -61,10 +68,15 @@ class network:
             delta[self.layerNumber-1]=(self.layer[self.layerNumber-1]-target)*self.sigmodDerivative(self.layer[self.layerNumber-1])
         for i in range(self.layerNumber-2,0,-1):
             delta[i]=np.dot(self.weight[i].T,delta[i+1])*self.sigmodDerivative(self.layer[i])
-        
+            # if i in self.mask:
+            #     delta[i]*=self.mask[i]
         for i in range(self.layerNumber-1):
-            self.weight[i]-=self.learningRate*delta[i+1].dot(self.layer[i].T)
+            if i+1 in self.mask:
+                self.weight[i]-=self.learningRate*(delta[i+1]*self.mask[i+1]).dot(self.layer[i].T)
+            else:
+                self.weight[i]-=self.learningRate*delta[i+1].dot(self.layer[i].T)
             self.const[i]-=self.learningRate*delta[i+1]
+        
             
     def error(self,output,target)->float:
         return np.sum(np.square(target-output))/2
